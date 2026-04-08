@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Fasilitas Kesehatan Kota Surakarta</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.1/mapbox-gl-directions.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.1/mapbox-gl-directions.css" rel="stylesheet">
+
+<style>
+body{
+    margin:0;
+    font-family:'Poppins', sans-serif;
+    scroll-behavior:smooth;
+}
+
+/* NAVBAR */
+.navbar{
+    position:fixed;
+    top:0;
+    width:100%;
+    height:60px;
+    background:rgba(15,23,42,0.85);
+    backdrop-filter: blur(10px);
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:10;
+}
+
+/* HERO */
+.hero{
+    height:100vh;
+    background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.85)),
+    url('assets/image/Surakarta.jpg');
+    background-size:cover;
+    background-position:center;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    color:white;
+}
+
+.hero h1{font-size:40px;}
+
+.btn-start{
+    margin-top:20px;
+    padding:12px 20px;
+    background:#e63946;
+    border:none;
+    color:white;
+    border-radius:10px;
+    font-weight:bold;
+    cursor:pointer;
+}
+.btn-start:hover{
+    background:#c1121f;
+}
+
+/* MAP */
+.map-section{
+    height:100vh;
+    position:relative;
+}
+
+#map{
+    position:absolute;
+    top:0;
+    bottom:0;
+    width:100%;
+}
+
+/* PANEL */
+.layer-control{
+    position:absolute;
+    top:80px;
+    left:15px;
+    background:white;
+    padding:15px;
+    border-radius:15px;
+    z-index:5;
+    box-shadow:0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* BUTTON */
+#fly{
+    position:absolute;
+    top:220px;
+    right:15px;
+    background:#e63946;
+    color:white;
+    border:none;
+    padding:10px 15px;
+    border-radius:10px;
+    z-index:5;
+}
+
+/*  BUTTON HOME */
+#backHome{
+    position:absolute;
+    top:220px;
+    right:140px;
+    background:#1d3557;
+    color:white;
+    border:none;
+    padding:10px 15px;
+    border-radius:10px;
+    z-index:5;
+}
+#backHome:hover{
+    background:#16324f;
+}
+
+/* LEGEND */
+.legend{
+    position:absolute;
+    bottom:20px;
+    right:15px;
+    background:white;
+    padding:12px;
+    border-radius:12px;
+    font-size:13px;
+}
+.legend span{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    display:inline-block;
+    margin-right:6px;
+}
+
+/*  FIX ROUTING PANEL */
+.mapboxgl-ctrl-top-right{
+    top:80px !important;
+}
+.mapboxgl-ctrl-top-left{
+    top:80px !important;
+}
+
+/* ============================= */
+/*  CUSTOM MAPBOX DIRECTIONS UI */
+/* ============================= */
+
+/* PANEL UTAMA */
+.mapboxgl-ctrl-directions {
+    background: rgba(255,255,255,0.95) !important;
+    border-radius: 15px !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important;
+    font-family: 'Poppins', sans-serif;
+    backdrop-filter: blur(10px);
+}
+
+/* INPUT A & B */
+.mapboxgl-ctrl-directions input {
+    border-radius: 10px !important;
+    border: none !important;
+    padding: 8px !important;
+    background: #f1f5f9 !important;
+    font-size: 13px;
+}
+
+/* ICON KOTAK A & B */
+.mapboxgl-ctrl-directions .directions-icon {
+    border-radius: 8px !important;
+}
+
+/* WARNA A (START) */
+.mapboxgl-ctrl-directions .mapbox-directions-origin .directions-icon {
+    background: #2a9d8f !important;
+    color: white !important;
+}
+
+/* WARNA B (TUJUAN) */
+.mapboxgl-ctrl-directions .mapbox-directions-destination .directions-icon {
+    background: #e63946 !important;
+    color: white !important;
+}
+
+/* TAB MODE (Driving, Walking, dll) */
+.mapboxgl-ctrl-directions .directions-profile {
+    border-radius: 10px !important;
+    overflow: hidden;
+    background: #e5e7eb;
+}
+
+.mapboxgl-ctrl-directions .directions-profile label {
+    font-size: 12px;
+}
+
+/* TAB AKTIF */
+.mapboxgl-ctrl-directions .directions-profile input:checked + label {
+    background: #1d3557 !important;
+    color: white !important;
+}
+
+/* HOVER BUTTON */
+.mapboxgl-ctrl-directions button:hover {
+    opacity: 0.85;
+}
+
+/* SPACING BIAR GA NEMPEL */
+.mapboxgl-ctrl-top-right {
+    top: 80px !important;
+}
+
+.mapboxgl-ctrl-top-left {
+    top: 80px !important;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    WebGIS Fasilitas Kesehatan Kota Surakarta dan Sekitarnya
+</div>
+
+<!-- HALAMAN 1 -->
+<section class="hero">
+<div>
+    <h1>Fasilitas Kesehatan</h1>
+    <p>Kota Surakarta dan Sekitarnya</p>
+    <a href="#mapSection">
+        <button class="btn-start">Selengkapnya</button>
+    </a>
+</div>
+</section>
+
+<!-- HALAMAN 2 -->
+<section class="map-section" id="mapSection">
+
+<input type="text" id="searchBox" placeholder="Cari fasilitas..."
+style="
+position:absolute;
+top:250px;
+left:15px;
+z-index:5;
+padding:10px;
+border-radius:10px;
+border:none;
+width:220px;
+box-shadow:0 5px 15px rgba(0,0,0,0.3);
+">
+
+<div id="map"></div>
+
+<button id="fly">Ke Pusat</button>
+<button id="backHome">← Home</button>
+
+<div class="layer-control">
+    <b>Filter Fasilitas</b><br>
+    <input type="checkbox" id="apotek" checked> Apotek<br>
+    <input type="checkbox" id="dokter" checked> Dokter Gigi<br>
+    <input type="checkbox" id="klinik" checked> Klinik<br>
+    <input type="checkbox" id="rs" checked> Rumah Sakit<br>
+</div>
+
+<div class="legend">
+<b>Legenda</b><br>
+<span style="background:#2a9d8f"></span>Apotek<br>
+<span style="background:#f4a261"></span>Dokter Gigi<br>
+<span style="background:#457b9d"></span>Klinik<br>
+<span style="background:#e63946"></span>Rumah Sakit
+</div>
+
+</section>
+
+<script>
+
+mapboxgl.accessToken = 'pk.eyJ1IjoiZmlyZGFhdWxpeWFyYWhtYSIsImEiOiJjbW5wdnI2eWQwMHZ4MzBwc2E5aGNkbm1oIn0.jLkgH9Y1ywcPyrg19wPi9w';
+
+const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v11',
+    center: [110.82903,-7.56934],
+    zoom: 11
+});
+
+map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+
+const directions = new MapboxDirections({
+    accessToken: mapboxgl.accessToken,
+    unit: 'metric',
+    profile: 'mapbox/driving',
+    language: 'id'
+});
+map.addControl(directions, 'top-right');
+
+// tombol fly
+document.getElementById('fly').addEventListener('click', () => {
+    map.flyTo({
+        center: [110.82903,-7.56934],
+        zoom: 15,
+        duration: 2000
+    });
+});
+
+// tombol kembali
+document.getElementById('backHome').addEventListener('click', () => {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+});
+
+map.on('load', () => {
+
+    // SOURCE
+    map.addSource('apotek',{type:'geojson',data:'assets/geojson/Apotek.geojson'});
+    map.addSource('dokter',{type:'geojson',data:'assets/geojson/Dokter Gigi.geojson'});
+    map.addSource('klinik',{type:'geojson',data:'assets/geojson/Klinik.geojson'});
+    map.addSource('rs',{type:'geojson',data:'assets/geojson/Rumah Sakit.geojson'});
+
+    // LAYER
+    map.addLayer({
+        id:'apotek-layer',
+        type:'circle',
+        source:'apotek',
+        paint:{ 'circle-color':'#2a9d8f','circle-radius':6 }
+    });
+
+    map.addLayer({
+        id:'dokter-layer',
+        type:'circle',
+        source:'dokter',
+        paint:{ 'circle-color':'#f4a261','circle-radius':6 }
+    });
+
+    map.addLayer({
+        id:'klinik-layer',
+        type:'circle',
+        source:'klinik',
+        paint:{ 'circle-color':'#457b9d','circle-radius':6 }
+    });
+
+    map.addLayer({
+        id:'rs-layer',
+        type:'circle',
+        source:'rs',
+        paint:{ 'circle-color':'#e63946','circle-radius':7 }
+    });
+
+    // TOGGLE
+    function toggleLayer(id, layer){
+        document.getElementById(id).addEventListener('change', function(){
+            const vis = this.checked ? 'visible' : 'none';
+            map.setLayoutProperty(layer, 'visibility', vis);
+        });
+    }
+
+    toggleLayer('apotek','apotek-layer');
+    toggleLayer('dokter','dokter-layer');
+    toggleLayer('klinik','klinik-layer');
+    toggleLayer('rs','rs-layer');
+
+    // =========================
+    // 🔥 SEARCH FITUR
+    // =========================
+    document.getElementById('searchBox').addEventListener('keyup', function(e){
+
+        let keyword = e.target.value.toLowerCase();
+
+        function filterLayer(layerId){
+            map.setFilter(layerId, [
+                "any",
+                ["in", keyword, ["downcase", ["get","nama"]]],
+                ["in", keyword, ["downcase", ["get","kategori"]]]
+            ]);
+        }
+
+        if(keyword === ""){
+            map.setFilter('apotek-layer', null);
+            map.setFilter('dokter-layer', null);
+            map.setFilter('klinik-layer', null);
+            map.setFilter('rs-layer', null);
+        } else {
+            filterLayer('apotek-layer');
+            filterLayer('dokter-layer');
+            filterLayer('klinik-layer');
+            filterLayer('rs-layer');
+        }
+
+    });
+
+});
+
+// ==============================
+// 🔍 SEARCH REALTIME (INDO → GEOJSON)
+// ==============================
+
+document.getElementById('searchBox').addEventListener('input', function(){
+
+    const keyword = normalizeKeyword(this.value);
+
+    if(keyword.length < 2) return;
+
+    let found = false;
+
+    const allData = [
+        ...apotekData.features,
+        ...dokterData.features,
+        ...klinikData.features,
+        ...rsData.features
+    ];
+
+    allData.forEach(f => {
+        const props = JSON.stringify(f.properties).toLowerCase();
+
+        if(props.includes(keyword) && !found){
+
+            const coord = f.geometry.coordinates;
+
+            map.flyTo({
+                center: coord,
+                zoom: 15
+            });
+
+            new mapboxgl.Popup()
+                .setLngLat(coord)
+                .setHTML(`<b>${f.properties.name || "Fasilitas"}</b>`)
+                .addTo(map);
+
+            found = true;
+        }
+    });
+
+});
+
+</script>
+
+</body>
+</html>
