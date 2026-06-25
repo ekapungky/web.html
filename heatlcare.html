@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Fasilitas Kesehatan Kota Surakarta</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.1/mapbox-gl-directions.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.1/mapbox-gl-directions.css" rel="stylesheet">
+
+<style>
+body{
+    margin:0;
+    font-family:'Poppins', sans-serif;
+    scroll-behavior:smooth;
+    background:#f8fafc;
+}
+
+.navbar{
+    position:fixed;
+    top:0;
+    width:100%;
+    height:58px;
+    background:linear-gradient(90deg, rgba(15,23,42,0.94), rgba(30,41,59,0.94));
+    backdrop-filter: blur(12px);
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:20;
+    font-weight:600;
+    font-size:15px;
+    letter-spacing:0.2px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.14);
+}
+
+.hero{
+    height:100vh;
+    background:
+    radial-gradient(circle at top right, rgba(230,57,70,0.18), transparent 22%),
+    linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.82)),
+    url('assets/image/Surakarta.jpg');
+    background-size:cover;
+    background-position:center;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    color:white;
+    position:relative;
+}
+
+.hero-content{
+    max-width:760px;
+    padding:0 20px;
+}
+
+.hero h1{
+    font-size:46px;
+    margin-bottom:10px;
+    line-height:1.1;
+    text-shadow:0 10px 25px rgba(0,0,0,0.25);
+}
+.hero p{
+    margin:0;
+    font-size:17px;
+    opacity:0.92;
+}
+
+.btn-start{
+    margin-top:22px;
+    padding:13px 22px;
+    background:#e63946;
+    border:none;
+    color:white;
+    border-radius:14px;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow:0 12px 24px rgba(230,57,70,0.26);
+    transition:all 0.25s ease;
+}
+.btn-start:hover{
+    background:#c1121f;
+    transform:translateY(-2px);
+}
+
+.map-section{
+    height:100vh;
+    position:relative;
+}
+
+#map{
+    position:absolute;
+    top:0;
+    bottom:0;
+    width:100%;
+}
+
+.glass-card{
+    background:rgba(255,255,255,0.88);
+    backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.55);
+    box-shadow:0 10px 24px rgba(15,23,42,0.12);
+}
+
+.layer-control{
+    position:absolute;
+    top:78px;
+    left:14px;
+    width:245px;
+    padding:14px 16px;
+    border-radius:18px;
+    z-index:5;
+    line-height:1.55;
+    transition:all 0.25s ease;
+}
+.layer-control:hover{
+    transform:translateY(-2px);
+    box-shadow:0 14px 30px rgba(15,23,42,0.16);
+}
+
+.panel-title{
+    font-size:16px;
+    font-weight:700;
+    color:#0f172a;
+    margin-bottom:4px;
+}
+
+.panel-subtitle{
+    font-size:11px;
+    color:#64748b;
+    margin-bottom:10px;
+    line-height:1.55;
+}
+
+.panel-label{
+    position:absolute;
+    left:14px;
+    z-index:6;
+    font-size:10px;
+    font-weight:600;
+    color:#334155;
+    background:rgba(255,255,255,0.94);
+    padding:5px 10px;
+    border-radius:999px;
+    border:1px solid rgba(148,163,184,0.18);
+    box-shadow:0 6px 16px rgba(15,23,42,0.08);
+    backdrop-filter:blur(8px);
+}
+
+.search-label{ top:345px; }
+.basemap-label{ top:415px; }
+
+#searchBox{
+    position:absolute;
+    top:372px;
+    left:14px;
+    z-index:5;
+    width:245px;
+    padding:11px 14px 11px 42px;
+    border-radius:14px;
+    border:none;
+    box-shadow:0 8px 18px rgba(15,23,42,0.10);
+    font-family:'Poppins', sans-serif;
+    background:rgba(255,255,255,0.94);
+    transition:all 0.25s ease;
+}
+#searchBox:focus,
+#basemapSelect:focus{
+    outline:none;
+    box-shadow:0 10px 22px rgba(29,53,87,0.16);
+}
+
+.search-wrap{
+    position:absolute;
+    top:372px;
+    left:14px;
+    z-index:6;
+    pointer-events:none;
+    width:245px;
+    height:42px;
+}
+.search-icon{
+    position:absolute;
+    left:14px;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:15px;
+    opacity:0.65;
+}
+
+#basemapSelect{
+    position:absolute;
+    top:442px;
+    left:14px;
+    z-index:5;
+    width:275px;
+    padding:11px 14px;
+    border-radius:14px;
+    border:none;
+    box-shadow:0 8px 18px rgba(15,23,42,0.10);
+    font-family:'Poppins', sans-serif;
+    background:rgba(255,255,255,0.94);
+    transition:all 0.25s ease;
+}
+
+#fly,
+#backHome{
+    position:absolute;
+    top:76px;
+    color:white;
+    border:none;
+    padding:10px 15px;
+    border-radius:12px;
+    z-index:7;
+    cursor:pointer;
+    font-family:'Poppins', sans-serif;
+    font-size:13px;
+    font-weight:600;
+    transition:all 0.25s ease;
+    box-shadow:0 10px 18px rgba(15,23,42,0.16);
+    min-width:96px;
+    text-align:center;
+}
+#fly:hover,
+#backHome:hover{
+    transform:translateY(-2px);
+}
+
+#fly{
+    right:14px;
+    background:#e63946;
+}
+
+#backHome{
+    right:124px;
+    background:#1d3557;
+}
+
+.legend{
+    position:absolute;
+    bottom:18px;
+    left:14px;
+    padding:12px 14px;
+    border-radius:16px;
+    font-size:13px;
+    z-index:5;
+    box-shadow:0 10px 24px rgba(15,23,42,0.12);
+    min-width:185px;
+}
+
+.legend b{
+    display:block;
+    margin-bottom:6px;
+    color:#0f172a;
+}
+
+.legend-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:6px;
+}
+
+.legend-color{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    display:inline-block;
+    flex:0 0 10px;
+}
+
+.legend-emoji{
+    font-size:14px;
+    line-height:1;
+    width:18px;
+    text-align:center;
+}
+
+.legend-text{
+    flex:1;
+    color:#1e293b;
+}
+
+.stats-bar{
+    position:absolute;
+    top:78px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:6;
+    display:flex;
+    gap:8px;
+    align-items:stretch;
+    justify-content:center;
+    flex-wrap:wrap;
+    width:calc(100% - 690px);
+    max-width:840px;
+}
+
+.stat-chip{
+    background:rgba(255,255,255,0.88);
+    border:1px solid rgba(255,255,255,0.65);
+    border-radius:16px;
+    padding:7px 12px;
+    box-shadow:0 8px 18px rgba(15,23,42,0.08);
+    backdrop-filter:blur(10px);
+    min-width:112px;
+    transition:all 0.25s ease;
+}
+.stat-chip:hover{
+    transform:translateY(-2px);
+}
+
+.stat-label{
+    font-size:10px;
+    color:#64748b;
+    margin-bottom:2px;
+    font-weight:600;
+}
+
+.stat-value{
+    font-size:14px;
+    font-weight:700;
+    color:#0f172a;
+    line-height:1.1;
+}
+
+.result-badge{
+    position:absolute;
+    top:132px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:6;
+    padding:7px 13px;
+    border-radius:999px;
+    background:rgba(15,23,42,0.84);
+    color:white;
+    font-size:12px;
+    box-shadow:0 10px 24px rgba(15,23,42,0.16);
+    display:none;
+}
+
+.mapboxgl-ctrl-top-left{
+    top:78px !important;
+}
+
+.mapboxgl-ctrl-top-right{
+    top:132px !important;
+    right:14px !important;
+}
+
+.mapboxgl-ctrl-directions {
+    width:320px !important;
+    max-width:320px !important;
+    background: rgba(255,255,255,0.95) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 12px 26px rgba(0,0,0,0.18) !important;
+    font-family: 'Poppins', sans-serif;
+    backdrop-filter: blur(10px);
+    z-index:6 !important;
+}
+
+.mapboxgl-ctrl-directions input {
+    border-radius: 10px !important;
+    border: none !important;
+    padding: 8px !important;
+    background: #f1f5f9 !important;
+    font-size: 13px;
+}
+
+.mapboxgl-ctrl-directions .directions-icon {
+    border-radius: 8px !important;
+}
+
+.mapboxgl-ctrl-directions .mapbox-directions-origin .directions-icon {
+    background: #2a9d8f !important;
+    color: white !important;
+}
+
+.mapboxgl-ctrl-directions .mapbox-directions-destination .directions-icon {
+    background: #e63946 !important;
+    color: white !important;
+}
+
+.mapboxgl-ctrl-directions .directions-profile {
+    border-radius: 10px !important;
+    overflow: hidden;
+    background: #e5e7eb;
+}
+
+.mapboxgl-ctrl-directions .directions-profile label {
+    font-size: 12px;
+}
+
+.mapboxgl-ctrl-directions .directions-profile input:checked + label {
+    background: #1d3557 !important;
+    color: white !important;
+}
+
+.mapboxgl-ctrl-directions button:hover {
+    opacity: 0.85;
+}
+
+.popup-card{
+    font-family:Poppins,sans-serif;
+    min-width:230px;
+}
+.popup-kategori{
+    display:inline-block;
+    margin-top:6px;
+    margin-bottom:8px;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:11px;
+    background:#f1f5f9;
+    color:#334155;
+}
+.popup-alamat{
+    color:#475569;
+    font-size:13px;
+    line-height:1.55;
+}
+.popup-button{
+    margin-top:12px;
+    background:#1d3557;
+    color:#fff;
+    border:none;
+    padding:9px 12px;
+    border-radius:10px;
+    cursor:pointer;
+    font-family:Poppins,sans-serif;
+    width:100%;
+}
+
+.mapbox-directions-route-line {
+    line-opacity: 0.95 !important;
+}
+
+.mapbox-directions-route-line-alt {
+    line-opacity: 0.45 !important;
+}
+
+.custom-copyright{
+    position:fixed;
+    bottom:10px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:4;
+    font-size:11px;
+    font-weight:500;
+    color:#475569;
+    background:rgba(255,255,255,0.78);
+    backdrop-filter:blur(8px);
+    padding:6px 12px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,0.55);
+    box-shadow:0 6px 14px rgba(15,23,42,0.08);
+    pointer-events:none;
+    white-space:nowrap;
+}
+
+@media (max-width: 1280px){
+    .stats-bar{
+        width:calc(100% - 640px);
+        max-width:760px;
+        gap:8px;
+    }
+
+    .stat-chip{
+        min-width:100px;
+        padding:7px 10px;
+    }
+
+    .mapboxgl-ctrl-directions{
+        width:290px !important;
+        max-width:290px !important;
+    }
+}
+
+@media (max-width: 1024px){
+    .stats-bar{
+        left:50%;
+        transform:translateX(-50%);
+        width:calc(100% - 40px);
+        top:78px;
+        flex-wrap:wrap;
+    }
+
+    .result-badge{
+        left:50%;
+        transform:translateX(-50%);
+    }
+
+    .mapboxgl-ctrl-directions{
+        width:260px !important;
+        max-width:260px !important;
+    }
+
+    #fly,
+    #backHome{
+        top:76px;
+    }
+}
+
+@media (max-width: 900px){
+    .hero h1{
+        font-size:34px;
+    }
+
+    .layer-control{
+        width:220px;
+    }
+
+    #searchBox{
+        width:220px;
+    }
+
+    .search-wrap{
+        width:220px;
+    }
+
+    #basemapSelect{
+        width:250px;
+    }
+
+    .stats-bar{
+        width:calc(100% - 30px);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    WebGIS Fasilitas Kesehatan Kota Surakarta dan Sekitarnya
+</div>
+
+<section class="hero">
+<div class="hero-content">
+    <h1>Fasilitas Kesehatan</h1>
+    <p>Kota Surakarta dan Sekitarnya</p>
+    <a href="#mapSection">
+        <button class="btn-start">Selengkapnya ↓</button>
+    </a>
+</div>
+</section>
+
+<section class="map-section" id="mapSection">
+
+<div class="stats-bar" id="statsBar">
+    <div class="stat-chip">
+        <div class="stat-label">Total Tampil</div>
+        <div class="stat-value" id="statTotal">0</div>
+    </div>
+    <div class="stat-chip">
+        <div class="stat-label">Apotek</div>
+        <div class="stat-value" id="statApotek">0</div>
+    </div>
+    <div class="stat-chip">
+        <div class="stat-label">Dokter Gigi</div>
+        <div class="stat-value" id="statDokter">0</div>
+    </div>
+    <div class="stat-chip">
+        <div class="stat-label">Klinik</div>
+        <div class="stat-value" id="statKlinik">0</div>
+    </div>
+    <div class="stat-chip">
+        <div class="stat-label">Rumah Sakit</div>
+        <div class="stat-value" id="statRs">0</div>
+    </div>
+</div>
+
+<div class="result-badge" id="resultBadge">Menampilkan 0 hasil</div>
+
+<div class="panel-label search-label">Pencarian fasilitas</div>
+<div class="search-wrap"><span class="search-icon">🔎</span></div>
+<input type="text" id="searchBox" placeholder="Cari fasilitas...">
+
+<div class="panel-label basemap-label">Pilih tampilan peta</div>
+<select id="basemapSelect">
+    <option value="mapbox://styles/mapbox/streets-v12">Streets</option>
+    <option value="mapbox://styles/mapbox/light-v11">Light</option>
+    <option value="mapbox://styles/mapbox/dark-v11">Dark</option>
+    <option value="mapbox://styles/mapbox/outdoors-v12">Outdoors</option>
+    <option value="mapbox://styles/mapbox/satellite-v9" selected>Satellite</option>
+    <option value="mapbox://styles/mapbox/satellite-streets-v12">Satellite Streets</option>
+</select>
+
+<div id="map"></div>
+
+<button id="fly">Ke Pusat</button>
+<button id="backHome">← Home</button>
+
+<div class="layer-control glass-card">
+    <div class="panel-title">Filter Fasilitas</div>
+    <div class="panel-subtitle">Pilih kategori untuk menampilkan fasilitas kesehatan pada peta</div>
+    <input type="checkbox" id="apotek" checked> Apotek<br>
+    <input type="checkbox" id="dokter" checked> Dokter Gigi<br>
+    <input type="checkbox" id="klinik" checked> Klinik<br>
+    <input type="checkbox" id="rs" checked> Rumah Sakit<br>
+</div>
+
+<div class="legend glass-card">
+  <b>Legenda</b>
+
+  <div class="legend-item">
+    <span class="legend-color" style="background:#2a9d8f"></span>
+    <span class="legend-emoji">💊</span>
+    <span class="legend-text">Apotek</span>
+  </div>
+
+  <div class="legend-item">
+    <span class="legend-color" style="background:#f4a261"></span>
+    <span class="legend-emoji">🦷</span>
+    <span class="legend-text">Dokter Gigi</span>
+  </div>
+
+  <div class="legend-item">
+    <span class="legend-color" style="background:#457b9d"></span>
+    <span class="legend-emoji">🩺</span>
+    <span class="legend-text">Klinik</span>
+  </div>
+
+  <div class="legend-item">
+    <span class="legend-color" style="background:#e63946"></span>
+    <span class="legend-emoji">🏥</span>
+    <span class="legend-text">Rumah Sakit</span>
+  </div>
+</div>
+
+</section>
+
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoiZmlyZGFhdWxpeWFyYWhtYSIsImEiOiJjbW5wdnI2eWQwMHZ4MzBwc2E5aGNkbm1oIn0.jLkgH9Y1ywcPyrg19wPi9w';
+
+const soloCenter = [110.82409,-7.57251];
+
+const categoryConfig = {
+    apotek: {
+        checkboxId: 'apotek',
+        sourceId: 'apotek',
+        file: 'assets/geojson/Apotek.geojson',
+        color: '#2a9d8f',
+        iconText: '💊',
+        searchTerms: ['apotek', 'obat', 'farmasi', 'pharmacy']
+    },
+    dokter: {
+        checkboxId: 'dokter',
+        sourceId: 'dokter',
+        file: 'assets/geojson/Dokter%20Gigi.geojson',
+        color: '#f4a261',
+        iconText: '🦷',
+        searchTerms: ['dokter', 'dokter gigi', 'gigi', 'dentist']
+    },
+    klinik: {
+        checkboxId: 'klinik',
+        sourceId: 'klinik',
+        file: 'assets/geojson/Klinik.geojson',
+        color: '#457b9d',
+        iconText: '🩺',
+        searchTerms: ['klinik', 'clinic']
+    },
+    rs: {
+        checkboxId: 'rs',
+        sourceId: 'rs',
+        file: 'assets/geojson/Rumah%20Sakit.geojson',
+        color: '#e63946',
+        iconText: '🏥',
+        searchTerms: ['rumah sakit', 'rs', 'hospital']
+    }
+};
+
+const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/outdoors-v12',
+    center: [110.82409, -7.57251],
+    zoom: 11.8
+});
+
+map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+
+const directions = new MapboxDirections({
+    accessToken: mapboxgl.accessToken,
+    unit: 'metric',
+    profile: 'mapbox/driving',
+    language: 'id',
+    controls: {
+        instructions: true,
+        profileSwitcher: true
+    }
+});
+map.addControl(directions, 'top-right');
+
+let geojsonStore = {
+    apotek: null,
+    dokter: null,
+    klinik: null,
+    rs: null
+};
+
+let popup = null;
+let currentRouteState = {
+    origin: null,
+    destination: null
+};
+let htmlMarkers = {
+    apotek: [],
+    dokter: [],
+    klinik: [],
+    rs: []
+};
+
+function normalizeText(text) {
+    return String(text || '').toLowerCase().trim();
+}
+
+function getProp(props, keys, fallback = '') {
+    for (const key of keys) {
+        if (props && props[key] !== undefined && props[key] !== null && props[key] !== '') {
+            return props[key];
+        }
+    }
+    return fallback;
+}
+
+function getFeatureName(feature) {
+    return getProp(feature.properties, ['nama', 'name', 'Nama'], 'Fasilitas');
+}
+
+function getFeatureCategory(feature) {
+    return getProp(feature.properties, ['kategori', 'category', 'Kategori'], '-');
+}
+
+function getFeatureAddress(feature) {
+    return getProp(feature.properties, ['alamat', 'Alamat', 'address'], '-');
+}
+
+function getFeatureCenter(feature) {
+    if (!feature.geometry) return { lng: soloCenter[0], lat: soloCenter[1] };
+
+    if (feature.geometry.type === 'Point') {
+        return {
+            lng: feature.geometry.coordinates[0],
+            lat: feature.geometry.coordinates[1]
+        };
+    }
+
+    const bounds = new mapboxgl.LngLatBounds();
+
+    function extendCoords(coords) {
+        if (typeof coords[0] === 'number' && typeof coords[1] === 'number') {
+            bounds.extend(coords);
+            return;
+        }
+        coords.forEach(extendCoords);
+    }
+
+    extendCoords(feature.geometry.coordinates);
+    const center = bounds.getCenter();
+    return { lng: center.lng, lat: center.lat };
+}
+
+function popupHTML(feature) {
+    const nama = getFeatureName(feature);
+    const kategori = getFeatureCategory(feature);
+    const alamat = getFeatureAddress(feature);
+    const center = getFeatureCenter(feature);
+    const categoryKey = getProp(feature.properties, ['_categoryKey'], '');
+    const emoji = categoryConfig[categoryKey]?.iconText || '📍';
+
+    return `
+        <div class="popup-card">
+            <div style="font-size:18px;font-weight:700;color:#0f172a;">${emoji} ${nama}</div>
+            <div class="popup-kategori">${kategori}</div>
+            <div class="popup-alamat">${alamat}</div>
+            <button class="popup-button" onclick="setRouteTo(${center.lng}, ${center.lat})">Rute ke sini</button>
+        </div>
+    `;
+}
+
+window.setRouteTo = function(lng, lat) {
+    const destination = [lng, lat];
+
+    function drawRoute(origin) {
+        currentRouteState.origin = origin;
+        currentRouteState.destination = destination;
+
+        directions.removeRoutes();
+        directions.setOrigin(origin);
+        directions.setDestination(destination);
+
+        setTimeout(() => {
+            const routePanel = document.querySelector('.mapboxgl-ctrl-directions');
+            if (routePanel) routePanel.style.zIndex = '6';
+        }, 200);
+    }
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                drawRoute([position.coords.longitude, position.coords.latitude]);
+            },
+            () => {
+                console.warn('Lokasi pengguna tidak tersedia, memakai titik pusat Solo sebagai asal.');
+                drawRoute(soloCenter);
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    } else {
+        drawRoute(soloCenter);
+    }
+};
+
+function restoreDirectionsRoute() {
+    if (!currentRouteState.origin || !currentRouteState.destination) return;
+
+    try {
+        if (map.hasControl(directions)) {
+            map.removeControl(directions);
+        }
+    } catch (e) {
+        console.warn('Directions control remove skipped:', e);
+    }
+
+    map.addControl(directions, 'top-right');
+
+    setTimeout(() => {
+        directions.setOrigin(currentRouteState.origin);
+        directions.setDestination(currentRouteState.destination);
+
+        const routePanel = document.querySelector('.mapboxgl-ctrl-directions');
+        if (routePanel) routePanel.style.zIndex = '6';
+    }, 250);
+}
+
+function enrichGeoJSONFeatures(categoryKey, data) {
+    const cfg = categoryConfig[categoryKey];
+    const cloned = JSON.parse(JSON.stringify(data));
+
+    cloned.features = (cloned.features || []).map(feature => {
+        const props = feature.properties || {};
+        const nama = getProp(props, ['nama', 'name', 'Nama'], '');
+        const kategori = getProp(props, ['kategori', 'category', 'Kategori'], categoryKey);
+        const alamat = getProp(props, ['alamat', 'Alamat', 'address'], '');
+        const searchBlob = normalizeText([
+            nama,
+            kategori,
+            alamat,
+            cfg.searchTerms.join(' '),
+            categoryKey
+        ].join(' '));
+
+        feature.properties = {
+            ...props,
+            _categoryKey: categoryKey,
+            _searchBlob: searchBlob
+        };
+
+        return feature;
+    });
+
+    return cloned;
+}
+
+function allFeatures() {
+    return [
+        ...(geojsonStore.apotek?.features || []),
+        ...(geojsonStore.dokter?.features || []),
+        ...(geojsonStore.klinik?.features || []),
+        ...(geojsonStore.rs?.features || [])
+    ];
+}
+
+async function loadGeoJSON(url) {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Gagal memuat ${url}`);
+    return await res.json();
+}
+
+function getLayerIdsByCategory(categoryKey) {
+    return {
+        polygonFill: `${categoryKey}-polygon-fill`,
+        polygonOutline: `${categoryKey}-polygon-outline`,
+        point: `${categoryKey}-point`
+    };
+}
+
+function sourceHasPolygonFeatures(data) {
+    return (data?.features || []).some(f =>
+        f.geometry &&
+        (f.geometry.type === 'Polygon' || f.geometry.type === 'MultiPolygon')
+    );
+}
+
+function sourceHasPointFeatures(data) {
+    return (data?.features || []).some(f =>
+        f.geometry &&
+        (f.geometry.type === 'Point' || f.geometry.type === 'MultiPoint')
+    );
+}
+
+function addFacilityLayers(categoryKey, sourceId, color) {
+    const ids = getLayerIdsByCategory(categoryKey);
+    const data = geojsonStore[categoryKey];
+
+    if (sourceHasPolygonFeatures(data)) {
+        if (!map.getLayer(ids.polygonFill)) {
+            map.addLayer({
+                id: ids.polygonFill,
+                type: 'fill',
+                source: sourceId,
+                filter: [
+                    'any',
+                    ['==', ['geometry-type'], 'Polygon'],
+                    ['==', ['geometry-type'], 'MultiPolygon']
+                ],
+                paint: {
+                    'fill-color': color,
+                    'fill-opacity': 0.35
+                }
+            });
+        }
+
+        if (!map.getLayer(ids.polygonOutline)) {
+            map.addLayer({
+                id: ids.polygonOutline,
+                type: 'line',
+                source: sourceId,
+                filter: [
+                    'any',
+                    ['==', ['geometry-type'], 'Polygon'],
+                    ['==', ['geometry-type'], 'MultiPolygon']
+                ],
+                paint: {
+                    'line-color': color,
+                    'line-width': 2
+                }
+            });
+        }
+    }
+
+    if (sourceHasPointFeatures(data)) {
+        if (!map.getLayer(ids.point)) {
+            map.addLayer({
+                id: ids.point,
+                type: 'circle',
+                source: sourceId,
+                filter: [
+                    'any',
+                    ['==', ['geometry-type'], 'Point'],
+                    ['==', ['geometry-type'], 'MultiPoint']
+                ],
+                paint: {
+                    'circle-color': color,
+                    'circle-radius': categoryKey === 'rs' ? 5 : 4,
+                    'circle-stroke-width': 1.2,
+                    'circle-stroke-color': '#ffffff'
+                }
+            });
+        }
+    }
+}
+
+function ensureSourcesAndLayers() {
+    Object.entries(categoryConfig).forEach(([key, cfg]) => {
+        if (!map.getSource(cfg.sourceId)) {
+            map.addSource(cfg.sourceId, {
+                type: 'geojson',
+                data: geojsonStore[key]
+            });
+        }
+        addFacilityLayers(key, cfg.sourceId, cfg.color);
+    });
+}
+
+function createEmojiElement(categoryKey) {
+    const cfg = categoryConfig[categoryKey];
+    const el = document.createElement('div');
+
+    el.style.width = '26px';
+    el.style.height = '26px';
+    el.style.borderRadius = '50%';
+    el.style.display = 'flex';
+    el.style.alignItems = 'center';
+    el.style.justifyContent = 'center';
+    el.style.background = cfg.color;
+    el.style.border = '2px solid #ffffff';
+    el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.25)';
+    el.style.fontSize = '14px';
+    el.style.lineHeight = '1';
+    el.style.cursor = 'pointer';
+    el.style.userSelect = 'none';
+    el.style.transition = 'box-shadow 0.2s ease, opacity 0.2s ease, filter 0.2s ease';
+    el.style.backfaceVisibility = 'hidden';
+    el.style.webkitBackfaceVisibility = 'hidden';
+    el.style.transform = 'translateZ(0)';
+    el.style.willChange = 'auto';
+
+    el.textContent = cfg.iconText;
+
+    el.addEventListener('mouseenter', () => {
+        el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.32)';
+        el.style.opacity = '0.96';
+        el.style.filter = 'brightness(1.03)';
+    });
+
+    el.addEventListener('mouseleave', () => {
+        el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.25)';
+        el.style.opacity = '1';
+        el.style.filter = 'none';
+    });
+
+    return el;
+}
+
+function clearHtmlMarkers() {
+    Object.keys(htmlMarkers).forEach(categoryKey => {
+        htmlMarkers[categoryKey].forEach(item => item.marker.remove());
+        htmlMarkers[categoryKey] = [];
+    });
+}
+
+function buildHtmlMarkers() {
+    clearHtmlMarkers();
+
+    Object.keys(categoryConfig).forEach(categoryKey => {
+        const features = geojsonStore[categoryKey]?.features || [];
+
+        features.forEach(feature => {
+            const center = getFeatureCenter(feature);
+            const el = createEmojiElement(categoryKey);
+
+            const marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
+                .setLngLat([center.lng, center.lat])
+                .addTo(map);
+
+            el.addEventListener('click', (evt) => {
+                evt.stopPropagation();
+
+                if (popup) popup.remove();
+
+                popup = new mapboxgl.Popup({ offset: 12 })
+                    .setLngLat([center.lng, center.lat])
+                    .setHTML(popupHTML(feature))
+                    .addTo(map);
+            });
+
+            htmlMarkers[categoryKey].push({
+                marker,
+                feature,
+                element: el
+            });
+        });
+    });
+}
+
+function applyMarkerVisibilityByState(keyword = '') {
+    const kw = normalizeText(keyword);
+
+    Object.entries(categoryConfig).forEach(([categoryKey, cfg]) => {
+        const checked = document.getElementById(cfg.checkboxId).checked;
+
+        htmlMarkers[categoryKey].forEach(item => {
+            const match = !kw || normalizeText(item.feature.properties?._searchBlob || '').includes(kw);
+            item.element.style.display = checked && match ? 'flex' : 'none';
+        });
+    });
+}
+
+function applyCheckboxVisibility() {
+    Object.entries(categoryConfig).forEach(([categoryKey, cfg]) => {
+        const checked = document.getElementById(cfg.checkboxId).checked;
+        const ids = getLayerIdsByCategory(categoryKey);
+
+        [ids.polygonFill, ids.polygonOutline, ids.point].forEach(layerId => {
+            if (map.getLayer(layerId)) {
+                map.setLayoutProperty(layerId, 'visibility', checked ? 'visible' : 'none');
+            }
+        });
+    });
+
+    applyMarkerVisibilityByState(document.getElementById('searchBox').value);
+}
+
+function getAllSearchableLayerIds() {
+    const allIds = [];
+
+    Object.keys(categoryConfig).forEach(categoryKey => {
+        const ids = getLayerIdsByCategory(categoryKey);
+        [ids.polygonFill, ids.polygonOutline, ids.point].forEach(layerId => {
+            if (map.getLayer(layerId)) allIds.push(layerId);
+        });
+    });
+
+    return allIds;
+}
+
+function matchesKeyword(feature, keyword) {
+    const kw = normalizeText(keyword);
+    if (!kw) return true;
+
+    const searchBlob = normalizeText(getProp(feature.properties, ['_searchBlob'], ''));
+    return searchBlob.includes(kw);
+}
+
+function getMatchedFeatures(keyword) {
+    const kw = normalizeText(keyword);
+
+    return allFeatures().filter(feature => {
+        const categoryKey = getProp(feature.properties, ['_categoryKey'], '');
+        const visibleByCheckbox = categoryKey ? document.getElementById(categoryConfig[categoryKey].checkboxId).checked : true;
+        return visibleByCheckbox && matchesKeyword(feature, kw);
+    });
+}
+
+function updateStats(keyword = '') {
+    const matched = normalizeText(keyword) ? getMatchedFeatures(keyword) : allFeatures().filter(feature => {
+        const categoryKey = getProp(feature.properties, ['_categoryKey'], '');
+        return categoryKey ? document.getElementById(categoryConfig[categoryKey].checkboxId).checked : true;
+    });
+
+    const counts = { apotek: 0, dokter: 0, klinik: 0, rs: 0 };
+    matched.forEach(feature => {
+        const key = getProp(feature.properties, ['_categoryKey'], '');
+        if (counts[key] !== undefined) counts[key] += 1;
+    });
+
+    document.getElementById('statTotal').textContent = matched.length;
+    document.getElementById('statApotek').textContent = counts.apotek;
+    document.getElementById('statDokter').textContent = counts.dokter;
+    document.getElementById('statKlinik').textContent = counts.klinik;
+    document.getElementById('statRs').textContent = counts.rs;
+
+    const badge = document.getElementById('resultBadge');
+    if (normalizeText(keyword)) {
+        badge.style.display = 'block';
+        badge.textContent = `Menampilkan ${matched.length} hasil untuk "${keyword}"`;
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+function applySearch(keyword) {
+    const kw = normalizeText(keyword);
+    if (!map.isStyleLoaded()) return;
+
+    const searchableLayers = getAllSearchableLayerIds();
+
+    if (!kw) {
+        searchableLayers.forEach(layerId => {
+            if (map.getLayer(layerId)) {
+                map.setFilter(layerId, null);
+            }
+        });
+        applyCheckboxVisibility();
+        updateStats('');
+        return;
+    }
+
+    const filterExpr = [
+        'in',
+        kw,
+        ['downcase', ['coalesce', ['get', '_searchBlob'], '']]
+    ];
+
+    searchableLayers.forEach(layerId => {
+        if (map.getLayer(layerId)) {
+            map.setFilter(layerId, filterExpr);
+        }
+    });
+
+    applyCheckboxVisibility();
+    applyMarkerVisibilityByState(keyword);
+    updateStats(keyword);
+}
+
+function zoomToMatchedFeatures(keyword) {
+    const kw = normalizeText(keyword);
+    if (kw.length < 1) return;
+
+    const matched = getMatchedFeatures(kw);
+    if (!matched.length) return;
+
+    const bounds = new mapboxgl.LngLatBounds();
+
+    matched.forEach(feature => {
+        if (feature.geometry.type === 'Point') {
+            bounds.extend(feature.geometry.coordinates);
+        } else {
+            const center = getFeatureCenter(feature);
+            bounds.extend([center.lng, center.lat]);
+        }
+    });
+
+    if (!bounds.isEmpty()) {
+        map.fitBounds(bounds, {
+            padding: { top: 100, bottom: 60, left: 80, right: 360 },
+            duration: 1000,
+            maxZoom: 16
+        });
+    }
+}
+
+function fitAllDataBounds() {
+    const features = allFeatures();
+    if (!features.length) return;
+
+    const bounds = new mapboxgl.LngLatBounds();
+
+    features.forEach(feature => {
+        if (!feature.geometry) return;
+
+        if (feature.geometry.type === 'Point') {
+            bounds.extend(feature.geometry.coordinates);
+        } else {
+            const center = getFeatureCenter(feature);
+            bounds.extend([center.lng, center.lat]);
+        }
+    });
+
+    if (!bounds.isEmpty()) {
+        map.fitBounds(bounds, {
+            padding: { top: 100, bottom: 60, left: 60, right: 360 },
+            duration: 1200,
+            maxZoom: 14
+        });
+    }
+}
+
+function restoreMapState(afterStyleChange = false) {
+    ensureSourcesAndLayers();
+    applyCheckboxVisibility();
+    applySearch(document.getElementById('searchBox').value);
+    updateStats(document.getElementById('searchBox').value);
+
+    if (!afterStyleChange) {
+        map.jumpTo({
+            center: [110.82409, -7.57251],
+            zoom: 11.8
+        });
+    }
+}
+
+document.getElementById('fly').addEventListener('click', () => {
+    map.flyTo({
+        center: soloCenter,
+        zoom: 13,
+        duration: 2000
+    });
+});
+
+document.getElementById('backHome').addEventListener('click', () => {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+});
+
+['apotek', 'dokter', 'klinik', 'rs'].forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+        const keyword = document.getElementById('searchBox').value;
+        applyCheckboxVisibility();
+        applySearch(keyword);
+        updateStats(keyword);
+        if (normalizeText(keyword)) {
+            zoomToMatchedFeatures(keyword);
+        }
+    });
+});
+
+document.getElementById('searchBox').addEventListener('input', function(e){
+    const keyword = e.target.value;
+    applySearch(keyword);
+
+    if (normalizeText(keyword)) {
+        zoomToMatchedFeatures(keyword);
+    } else {
+        fitAllDataBounds();
+    }
+});
+
+document.getElementById('basemapSelect').addEventListener('change', function() {
+    map.setStyle(this.value);
+
+    map.once('style.load', () => {
+        restoreMapState(true);
+        buildHtmlMarkers();
+        applyMarkerVisibilityByState(document.getElementById('searchBox').value);
+        restoreDirectionsRoute();
+    });
+});
+
+map.on('load', async () => {
+    try {
+        const [apotekRaw, dokterRaw, klinikRaw, rsRaw] = await Promise.all([
+            loadGeoJSON(categoryConfig.apotek.file),
+            loadGeoJSON(categoryConfig.dokter.file),
+            loadGeoJSON(categoryConfig.klinik.file),
+            loadGeoJSON(categoryConfig.rs.file)
+        ]);
+
+        geojsonStore.apotek = enrichGeoJSONFeatures('apotek', apotekRaw);
+        geojsonStore.dokter = enrichGeoJSONFeatures('dokter', dokterRaw);
+        geojsonStore.klinik = enrichGeoJSONFeatures('klinik', klinikRaw);
+        geojsonStore.rs = enrichGeoJSONFeatures('rs', rsRaw);
+
+        restoreMapState(false);
+        buildHtmlMarkers();
+        applyMarkerVisibilityByState('');
+        updateStats('');
+
+        const directionsContainer = document.querySelector('.mapboxgl-ctrl-directions');
+        if (directionsContainer) {
+            directionsContainer.style.zIndex = '6';
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert('Data GeoJSON gagal dimuat. Cek nama file, path assets/geojson/, dan tipe geometrinya.');
+    }
+});
+
+map.on('error', (e) => {
+    console.error('Mapbox error:', e);
+});
+</script>
+
+<div class="custom-copyright">
+  © 2026 WebGIS Fasilitas Kesehatan Surakarta / Eka Pungky Aprillia / 117230034
+</div>
+
+</body>
+</html>
